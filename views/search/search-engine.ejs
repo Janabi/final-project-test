@@ -26,6 +26,38 @@
         <%})%>
 
     <%}%>
+
+    <%if (videos.length > 0  ){%>
+        <%videos[0].forEach(video=>{%>
+            <video width="320" height="240" controls>
+                <source src="<%= video.video_url%>" type="video/mp4">
+              </video>
+            <p><%=video.url%> </p>
+        <%})%>
+        <hr>
+        <hr>
+        <%videos[1].forEach(video=>{%>
+            <video width="320" height="240" controls>
+                <source src="<%= video.video_url%>" type="video/mp4">
+              </video>
+            <p><%=video.url%> </p>
+        <%})%>
+    <%}%>
+
+    <%if (gifs.length > 0  ){%>
+        <%gifs.forEach(video=>{%>
+            <video width="320" height="240" controls>
+                <source src="<%= video.gif_url%>" type="video/mp4">
+              </video>
+            <p><%=video.url%> </p>
+        <%})%>
+        
+    <%}%>
+
+    <%if (noChoice.length > 0  ){%>
+        <p><%= noChoice %></p>
+        
+    <%}%>
     
 </body>
 </html>
