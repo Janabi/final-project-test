@@ -18,7 +18,11 @@ app.use(methodOverride('_method'));
 
 app.set('view engine', 'ejs');
 const pg = require('pg');
+const { pipe } = require('superagent');
 const client = new pg.Client(process.env.DATABASE_URL);
+
+let usernameAccount = '';
+let userID = [];
 
 // Routes
 app.get('/', indexPage);
@@ -28,7 +32,10 @@ app.post('/search', searchMedia);
 // Routes of Login System
 app.get('/joinus', loginSystem);
 app.post('/signup', signupSystem);
-app.post('/signin', signinSystem)
+app.post('/signin', signinSystem);
+app.post('/logout', logoutSystem);
+// Routes for adding item to favorites
+app.post('/addFavorite', addFavorite);
 
 
 // Main Page
@@ -39,6 +46,29 @@ function indexPage(request, response) {
 // First attempt to the search page
 function showSearchEngine(request, response) {
     response.render('./search/search-engine', {images: [], videos: [], gifs: [], noChoice: ''});
+}
+
+// 
+function addFavorite (request, response) {
+    if (usernameAccount != ''){
+        let {download_url, url, data_type} = request.body;
+        let SQL = `INSERT INTO favoriteLists (download_url, page_url, data_type, user_id) VALUES ($1, $2, $3, $4);`;
+        let safeValues = [download_url, url, data_type, userID[0]];
+        client.query(SQL, safeValues)
+        .then(()=>{
+            let SQL = `SELECT * FROM favoriteLists WHERE user_id=${userID[0]};`;
+            client.query(SQL)
+            .then(results=>{
+                response.render('./user/bookmark-list', {userData: results.rows, name: usernameAccount});
+            })
+        })
+    }
+}
+
+// Press Log out button
+function logoutSystem(request, response) {
+    usernameAccount = '';
+    response.redirect('/joinus');
 }
 
 // Getting data from API in the search page
@@ -104,41 +134,51 @@ function searchMedia(request, response) {
 
 // Login System
 function loginSystem (request, response) {
+    console.log(usernameAccount);
     response.render('./user/sign-up-in');
 }
 
 function signupSystem(request, response) {
     let {email, username, password} = request.body;
-    if (checkUsername(username) === undefined){
-        let SQL = `INSERT INTO users (email, username, password) VALUES ($1, $2, $3);`;
-        let safeValues = [email, username, password];
-        client.query(SQL, safeValues)
-        .then(()=>{
-            response.redirect('/joinus');
-        })
-    }
+    checkUsername(username).then(data=>{
+        if(data.length === 0) {
+            let SQL = `INSERT INTO users (email, username, password) VALUES ($1, $2, $3);`;
+            let safeValues = [email, username, password];
+            client.query(SQL, safeValues)
+            .then(()=>{
+                response.redirect('/joinus');
+            })
+        }
+    })
 }
 
 function signinSystem (request, response) {
     let {username, password} = request.body;
-    if (checkUsername(username)) {
-        let SQL = `SELECT username, email FROM users WHERE username=$1 AND password=$2;`;
-        let safeValues = [username, password];
-        client.query(SQL, safeValues)
-        .then(results=>{
-            console.log(results.rows);
-            response.render('./user/bookmark-list', {userData: results.rows[0]});
-        })
-    }
-    console.log('hello')
+    checkUsername(username).then(data=>{
+        if(data.length >0){
+            let SQL = `SELECT id, username, email FROM users WHERE username=$1 AND password=$2;`;
+            let safeValues = [username, password];
+            client.query(SQL, safeValues)
+            .then(results=>{
+                userID = [results.rows[0].id];
+                usernameAccount = results.rows[0].username;
+                let SQL= `SELECT download_url, page_url, note FROM favoriteLists WHERE user_id=$1`;
+                client.query(SQL, userID)
+                .then(results=>{
+                    response.render('./user/bookmark-list', {userData: results.rows, name: usernameAccount});
+
+                })
+            })
+        }
+    })
 }
 
 function checkUsername(username){
     let SQL = `SELECT * FROM users WHERE username=$1;`;
     let safeValue = [username];
-    client.query(SQL, safeValue)
+    return client.query(SQL, safeValue)
     .then(result=>{
-        return result.rows[0];
+        return result.rows;
     })
 }
 

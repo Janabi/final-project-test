@@ -6,6 +6,16 @@
     <title>Document</title>
 </head>
 <body>
-    <h1><%= userData.username %></h1>
+    <h1>Hello <%= name %></h1>
+    <form action="/logout" method="post">
+        <button type="submit">Log out</button>
+    </form>
+    <%if (userData.length > 0){%>
+        <%userData.forEach(item=>{%>
+            <p><%= item.download_url %></p>
+            <p><%= item.page_url %></p>
+            <p><%= item.data_type %></p>
+        <%})%>
+    <%}%>
 </body>
 </html>

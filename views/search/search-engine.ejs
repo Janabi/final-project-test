@@ -15,41 +15,81 @@
     </form>
     <%if (images.length > 0){%>
         <%images[0].forEach(image=>{%>
-            <img src="<%= image.image_url %>" alt="" srcset="">
-            <p><%= image.url %></p>
+            <div>
+                <img src="<%= image.image_url %>" alt="" srcset="">
+                <p><%= image.url %></p>
+                <form action="/addFavorite" method="post">
+                    <input type="hidden" name="download_url" value="<%= image.image_url %>">
+                    <input type="hidden" name="url" value="<%= image.url %>">
+                    <input type="hidden" name="data_type" value="<%= 'image' %>">
+                    <button type="submit">Add to Favorite</button>
+                </form>
+            </div>
         <%})%>
         <hr>
         <hr>
         <%images[1].forEach(image=>{%>
-            <img src="<%= image.image_url %>" alt="" srcset="">
-            <p><%= image.url %></p>
+            <div>
+                <img src="<%= image.image_url %>" alt="" srcset="">
+                <p><%= image.url %></p>
+                <form action="/addFavorite" method="post">
+                    <input type="hidden" name="download_url" value="<%= image.image_url %>">
+                    <input type="hidden" name="url" value="<%= image.url %>">
+                    <input type="hidden" name="data_type" value="<%= 'image' %>">
+                    <button type="submit">Add to Favorite</button>
+                </form>
+            </div>
         <%})%>
 
     <%}%>
 
     <%if (videos.length > 0  ){%>
         <%videos[0].forEach(video=>{%>
-            <video width="320" height="240" controls>
-                <source src="<%= video.video_url%>" type="video/mp4">
-              </video>
-            <p><%=video.url%> </p>
+            <div>
+                <video width="320" height="240" controls>
+                    <source src="<%= video.video_url%>" type="video/mp4">
+                  </video>
+                <p><%=video.url%> </p>
+                <form action="/addFavorite" method="post">
+                    <input type="hidden" name="download_url" value="<%= video.video_url %>">
+                    <input type="hidden" name="url" value="<%= video.url %>">
+                    <input type="hidden" name="data_type" value="<%= 'video' %>">
+                    <button type="submit">Add to Favorite</button>
+                </form>
+            </div>
         <%})%>
         <hr>
         <hr>
         <%videos[1].forEach(video=>{%>
-            <video width="320" height="240" controls>
-                <source src="<%= video.video_url%>" type="video/mp4">
-              </video>
-            <p><%=video.url%> </p>
+            <div>
+                <video width="320" height="240" controls>
+                    <source src="<%= video.video_url%>" type="video/mp4">
+                  </video>
+                <p><%=video.url%> </p>
+                <form action="/addFavorite" method="post">
+                    <input type="hidden" name="download_url" value="<%= video.video_url %>">
+                    <input type="hidden" name="url" value="<%= video.url %>">
+                    <input type="hidden" name="data_type" value="<%= 'video' %>">
+                    <button type="submit">Add to Favorite</button>
+                </form>
+            </div>
         <%})%>
     <%}%>
 
     <%if (gifs.length > 0  ){%>
         <%gifs.forEach(video=>{%>
-            <video width="320" height="240" controls>
-                <source src="<%= video.gif_url%>" type="video/mp4">
-              </video>
-            <p><%=video.url%> </p>
+            <div>
+                <video width="320" height="240" controls>
+                    <source src="<%= video.gif_url%>" type="video/mp4">
+                  </video>
+                <p><%=video.url%> </p>
+                <form action="/addFavorite" method="post">
+                    <input type="hidden" name="download_url" value="<%= video.video_url %>">
+                    <input type="hidden" name="url" value="<%= video.url %>">
+                    <input type="hidden" name="data_type" value="<%= 'video' %>">
+                    <button type="submit">Add to Favorite</button>
+                </form>
+            </div>
         <%})%>
         
     <%}%>
