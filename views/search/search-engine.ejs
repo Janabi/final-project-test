@@ -4,11 +4,32 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
-        <script id="main" type="text/x-tmpl-mustache">
+        <script id="image" type="text/x-tmpl-mustache">
             <section id="photo-template">
               <img src="{{imageURL}}" alt="">
-              <p>{{url}}</p>
+              <a href="{{url}}"></a>
               <p>{{data_type}}</p>
+              <form action="/addFavorite" method="post">
+                <input type="hidden" name="download_url" value="{{imageURL}}">
+                <input type="hidden" name="url" value="{{url}}">
+                <input type="hidden" name="data_type" value="{{data_type}}">
+                <button type="submit">Add to Favorite</button>
+            </form>
+            </section>
+        </script>
+        <script id="video" type="text/x-tmpl-mustache">
+            <section id="video-template">
+                <video width="320" height="240" controls>
+                    <source src="{{imageURL}}" type="video/mp4">
+                </video>
+            <a href="{{url}}"></a>
+              <p>{{data_type}}</p>
+              <form action="/addFavorite" method="post">
+                <input type="hidden" name="download_url" value="{{imageURL}}">
+                <input type="hidden" name="url" value="{{url}}">
+                <input type="hidden" name="data_type" value="{{data_type}}">
+                <button type="submit">Add to Favorite</button>
+            </form>
             </section>
         </script>
     </head>
@@ -18,6 +39,7 @@
             <input type="radio" name="category" value="images" id="image">image
             <input type="radio" name="category" value="videos" id="">video
             <input type="radio" name="category" value="gifs" id="">Giphy
+            <input type="hidden" name="sure" value="change">
             <button type="submit">Search Results</button>
         </form>
         
@@ -25,7 +47,7 @@
             <%images[0].forEach(image=>{%>
                 <div>
                     <img src="<%= image.image_url %>" width="300" height="300" alt="" srcset="">
-                    <p><%= image.url %></p>
+                    <a href="<%= image.url %>"></a>
                     <form action="/addFavorite" method="post">
                         <input type="hidden" name="download_url" value="<%= image.image_url %>">
                         <input type="hidden" name="url" value="<%= image.url %>">
@@ -34,12 +56,10 @@
                     </form>
                 </div>
                 <%})%>
-                <hr>
-                <hr>
                 <%images[1].forEach(image=>{%>
                     <div>
                         <img src="<%= image.image_url %>" width="300" height="300" alt="" srcset="">
-                        <p><%= image.url %></p>
+                        <a href="<%= image.url %>"></a>
                         <form action="/addFavorite" method="post">
                             <input type="hidden" name="download_url" value="<%= image.image_url %>">
                             <input type="hidden" name="url" value="<%= image.url %>">
@@ -47,14 +67,20 @@
                             <button type="submit">Add to Favorite</button>
                         </form>
                     </div>
-                    <%})%>
-                    <button class="loadMore">Load More</button>    
+                    <%})%>   
                     <div class="main">
                         <section id="photo-template">
                             <img src="" alt="">
-                            <p></p>
+                            <a href=""></a>
+                            <form action="/addFavorite" method="post">
+                                <input type="hidden" name="download_url" value="">
+                                <input type="hidden" name="url" value="">
+                                <input type="hidden" name="data_type" value="">
+                                <button type="submit">Add to Favorite</button>
+                            </form>
                         </section>
                     </div>
+                    <button class="loadMore">Load More</button> 
     <%}%>
 
     <%if (videos.length > 0  ){%>
@@ -63,7 +89,7 @@
                 <video width="320" height="240" controls>
                     <source src="<%= video.video_url%>" type="video/mp4">
                 </video>
-                <p><%=video.url%> </p>
+                <a href="<%=video.url%>"></a>
                 <form action="/addFavorite" method="post">
                     <input type="hidden" name="download_url" value="<%= video.video_url %>">
                     <input type="hidden" name="url" value="<%= video.url %>">
@@ -79,7 +105,7 @@
                 <video width="320" height="240" controls>
                     <source src="<%= video.video_url%>" type="video/mp4">
                   </video>
-                <p><%=video.url%> </p>
+                <a href="<%=video.url%>"></a>
                 <form action="/addFavorite" method="post">
                     <input type="hidden" name="download_url" value="<%= video.video_url %>">
                     <input type="hidden" name="url" value="<%= video.url %>">
@@ -87,7 +113,22 @@
                     <button type="submit">Add to Favorite</button>
                 </form>
             </div>
-        <%})%>
+        <%})%>   
+        <div class="main">
+            <section id="video-template">
+                <video width="320" height="240" controls>
+                    <source src="" type="video/mp4">
+                </video>
+                <a href=""></a>
+                <form action="/addFavorite" method="post">
+                    <input type="hidden" name="download_url" value="">
+                    <input type="hidden" name="url" value="">
+                    <input type="hidden" name="data_type" value="">
+                    <button type="submit">Add to Favorite</button>
+                </form>
+            </section>
+        </div>
+        <button class="loadMore">Load More</button> 
     <%}%>
 
     <%if (gifs.length > 0  ){%>
@@ -96,7 +137,7 @@
                 <video width="320" height="240" controls>
                     <source src="<%= video.gif_url%>" type="video/mp4">
                   </video>
-                <p><%=video.url%> </p>
+                <a href="<%=video.url%>"></a>
                 <form action="/addFavorite" method="post">
                     <input type="hidden" name="download_url" value="<%= video.video_url %>">
                     <input type="hidden" name="url" value="<%= video.url %>">
@@ -105,7 +146,22 @@
                 </form>
             </div>
         <%})%>
-        
+           
+        <div class="main">
+            <section id="video-template">
+                <video width="320" height="240" controls>
+                    <source src="" type="video/mp4">
+                </video>
+                <a href=""></a>
+                <form action="/addFavorite" method="post">
+                    <input type="hidden" name="download_url" value="">
+                    <input type="hidden" name="url" value="">
+                    <input type="hidden" name="data_type" value="">
+                    <button type="submit">Add to Favorite</button>
+                </form>
+            </section>
+        </div>
+        <button class="loadMore">Load More</button> 
     <%}%>
 
     <%if (noChoice.length > 0  ){%>

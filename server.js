@@ -33,11 +33,14 @@ app.post('/loadMore', loadMore);
 // Routes of Login System
 app.get('/joinus', loginSystem);
 app.post('/signup', signupSystem);
-app.post('/signin', signinSystem);
+// app.post('/signin', signinSystem);
 app.post('/logout', logoutSystem);
 // Routes for adding item to favorites
 app.post('/addFavorite', addFavorite);
-
+app.get('/myFavorite', favoriteProfile);
+app.post('/myFavorite', myFavoriteList);
+app.put('/myFavorite/:id', updateFavoriteNote);
+app.delete('/myFavorite/:id', deleteFavoriteNote);
 
 // Main Page
 function indexPage(request, response) {
@@ -47,6 +50,37 @@ function indexPage(request, response) {
 // First attempt to the search page
 function showSearchEngine(request, response) {
     response.render('./search/search-engine', {images: [], videos: [], gifs: [], noChoice: ''});
+}
+
+function myFavoriteList(request, response) {
+    let {username, password} = request.body;
+    checkUsername(username).then(data=>{
+        if(data.length >0){
+            let SQL = `SELECT id, username, email FROM users WHERE username=$1 AND password=$2;`;
+            let safeValues = [username, password];
+            client.query(SQL, safeValues)
+            .then(results=>{
+                userID = [results.rows[0].id];
+                usernameAccount = results.rows[0].username;
+                let SQL= `SELECT id, data_type, download_url, page_url, note FROM favoriteLists WHERE user_id=$1`;
+                client.query(SQL, userID)
+                .then(results=>{
+                    response.render('./user/bookmark-list', {userData: results.rows, name: usernameAccount});
+
+                })
+            })
+        }
+    })
+}
+
+function favoriteProfile(request, response){
+    let safeValue = [usernameAccount];
+    let SQL = `SELECT f.id, f.data_type, f.download_url, f.page_url, f.note FROM favoriteLists AS f JOIN users AS u ON f.user_id = u.id WHERE u.username=$1`;
+    client.query(SQL, safeValue)
+    .then(results=>{
+        console.log(usernameAccount);
+        response.render('./user/bookmark-list', {userData: results.rows, name: usernameAccount})
+    })
 }
 
 // 
@@ -66,54 +100,104 @@ function addFavorite (request, response) {
     }
 }
 
+function updateFavoriteNote(request, response) {
+    let itemID = request.params.id;
+    let note = request.body.note;
+    let SQL= `UPDATE favoriteLists SET note=$1 WHERE id=$2;`;
+    let safeValues = [note, itemID];
+    client.query(SQL, safeValues)
+    .then(()=>{
+        response.redirect('/myFavorite');
+    })
+}
+
+function deleteFavoriteNote(request, response){
+    let itemID = [request.params.id];
+    let SQL = `DELETE FROM favoriteLists WHERE id=$1;`;
+    client.query(SQL, itemID)
+    .then(()=>{
+        response.redirect('/myFavorite');
+    })
+}
+
 // Press Log out button
 function logoutSystem(request, response) {
     usernameAccount = '';
     response.redirect('/joinus');
 }
 let page= 0;
-let category, searchResult;
+let category='', searchResult='';
 function loadMore (request, response) {
     searchMedia(request, response)
     .then(result=>{
-        console.log(result);
         let imageUrl = [];
         let url1 = [];
         let type = [];
         let finalArr=[];
-        result[0].forEach(item=>{
-            imageUrl.push(item.image_url);
-            type.push(result[2]);
-        });
-        result[1].forEach(item=>{
-            imageUrl.push(item.image_url);
-            type.push(result[2]);
-        });
-        result[0].forEach(item=>{
-            url1.push(item.url);
-        });
-        result[1].forEach(item=>{
-            url1.push(item.url);
-        });
-        for (let i=0; i< 10;i++){
-            let obj = new Object();
-            obj.imageURL = imageUrl[i];
-            obj.url = url1[i];
-            obj.data_type = type[i];
-            finalArr.push(obj);
-
+        console.log(result);
+        if(result[1] !== 'giphy') {
+            if (result[2] === 'image') {
+                result[0].forEach(item=>{
+                    imageUrl.push(item.image_url);
+                    type.push(result[2]);
+                });
+                result[1].forEach(item=>{
+                    imageUrl.push(item.image_url);
+                    type.push(result[2]);
+                });
+            } 
+            if (result[2] === 'video') {
+                result[0].forEach(item=>{
+                    imageUrl.push(item.video_url);
+                    type.push(result[2]);
+                });
+                result[1].forEach(item=>{
+                    imageUrl.push(item.video_url);
+                    type.push(result[2]);
+                });
+            }
+            result[0].forEach(item=>{
+                url1.push(item.url);
+            });
+            result[1].forEach(item=>{
+                url1.push(item.url);
+            });
+            for (let i=0; i< 10;i++){
+                let obj = new Object();
+                obj.imageURL = imageUrl[i];
+                obj.url = url1[i];
+                obj.data_type = type[i];
+                finalArr.push(obj);
+            }
         }
-        
-        console.log(finalArr);
+
+        if (result[1] === 'giphy') {
+            result[0].forEach(item=>{
+                imageUrl.push(item.gif_url);
+                type.push(result[2]);
+            });
+            result[0].forEach(item=>{
+                url1.push(item.url);
+            });
+            for (let i=0; i< 10;i++){
+                let obj = new Object();
+                obj.imageURL = imageUrl[i];
+                obj.url = url1[i];
+                obj.data_type = type[i];
+                finalArr.push(obj);
+            }
+        }
         httpMsgs.sendJSON(request,response,finalArr)
     })
 }
 // Getting data from API in the search page
 function searchMedia(request, response) {
-    const numPerPage = 5;
+    let numPerPage = 5;
     ++page;
-    const start = ((page - 1) * numPerPage + 1);
-    if(!category && !searchResult) {
+    let start = ((page - 1) * numPerPage + 1);
+    let changeCategory = request.body.sure;
+    if((!category && !searchResult) || changeCategory) {
+        page =1;
         category = request.body.category;
         searchResult = request.body.search_engine;
     }
@@ -122,6 +206,7 @@ function searchMedia(request, response) {
     let keyGiphy = process.env.GIPHY_KEY;
 
     if (category === 'images') {
+        console.log('hello image')
         let url = `https://api.pexels.com/v1/search?query=${searchResult}&per_page=${numPerPage}&page=${start}`;
         return superagent.get(url)
         .set({'Authorization': 'Bearer ' + key})
@@ -144,30 +229,43 @@ function searchMedia(request, response) {
             
         })
     } else if (category==='videos'){
-        let url =`https://api.pexels.com/videos/search?query=${searchResult}&total_results=5`;
-        superagent.get(url)
+        console.log('hello video')
+        let url =`https://api.pexels.com/videos/search?query=${searchResult}&per_page=${numPerPage}&page=${start}`;
+        return superagent.get(url)
         .set({'Authorization': 'Bearer ' + key})
         .then(results=>{
             let videoResultPexel= results.body.videos.map(item=>{
                 return new VideosPexel(item);
             })
-            let url1=`https://pixabay.com/api/videos/?key=${keyPixabay}&q=${searchResult}`;
-            superagent.get(url1)
+            let url1=`https://pixabay.com/api/videos/?key=${keyPixabay}&q=${searchResult}&per_page=${numPerPage}&page=${start}`;
+            return superagent.get(url1)
             .then(results=>{
                 let videoResultPixabay= results.body.hits.map(item=>{
                     return new VideoPixabay(item);
                 })
-                response.render('./search/search-engine',{images:[], videos: [videoResultPexel,videoResultPixabay], gifs: [], noChoice: ''})
+                if (page == 1){
+                    response.render('./search/search-engine',{images:[], videos: [videoResultPexel,videoResultPixabay], gifs: [], noChoice: ''})
+                }
+                let type = 'video'
+                return [videoResultPexel, videoResultPixabay, type];
             })
         })
     } else if(category === 'gifs') {
-        let url =`https://api.giphy.com/v1/gifs/search?api_key=${keyGiphy}&q=${searchResult}&limit=5`;
-        superagent.get(url)
+        console.log('hello gifs')
+        numPerPage = 10;
+        start = ((page - 1) * numPerPage + 1);
+        let url =`https://api.giphy.com/v1/gifs/search?api_key=${keyGiphy}&q=${searchResult}&limit=${numPerPage}&offset=${start}`;
+        return superagent.get(url)
         .then(results=>{
             let giphyResult = results.body.data.map(item=>{
                 return new Giphy(item);
             });
-            response.render('./search/search-engine', {images: [], videos: [], gifs: giphyResult, noChoice: ''})
+            if (page == 1) {
+                response.render('./search/search-engine', {images: [], videos: [], gifs: giphyResult, noChoice: ''})
+            }
+            let type = 'video';
+            let gif = 'giphy';
+            return [giphyResult, gif, type];
         })
     } else {
         response.render('./search/search-engine', {images: [], videos: [], gifs: [], noChoice: 'You have to pick a category'})
@@ -195,26 +293,9 @@ function signupSystem(request, response) {
     })
 }
 
-function signinSystem (request, response) {
-    let {username, password} = request.body;
-    checkUsername(username).then(data=>{
-        if(data.length >0){
-            let SQL = `SELECT id, username, email FROM users WHERE username=$1 AND password=$2;`;
-            let safeValues = [username, password];
-            client.query(SQL, safeValues)
-            .then(results=>{
-                userID = [results.rows[0].id];
-                usernameAccount = results.rows[0].username;
-                let SQL= `SELECT download_url, page_url, note FROM favoriteLists WHERE user_id=$1`;
-                client.query(SQL, userID)
-                .then(results=>{
-                    response.render('./user/bookmark-list', {userData: results.rows, name: usernameAccount});
-
-                })
-            })
-        }
-    })
-}
+// function signinSystem (request, response) {
+//     response.redirect('/addFavorite');
+// }
 
 function checkUsername(username){
     let SQL = `SELECT * FROM users WHERE username=$1;`;

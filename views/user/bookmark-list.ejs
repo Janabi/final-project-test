@@ -12,17 +12,31 @@
     </form>
     <%if (userData.length > 0){%>
         <%userData.forEach(item=>{%>
-            if (item.data_type === 'video') {
+            <%if (item.data_type == 'video') {%>
                 <video width="320" height="240" controls>
                     <source src="<%= item.download_url%>" type="video/mp4">
                 </video>
-                <form action="" method="get"></form>
-            } else if(item.data_type === 'image'){
-
-            }
-            <p><%= item.download_url %></p>
-            <p><%= item.page_url %></p>
-            <p><%= item.data_type %></p>
+                <a href="<%= item.url %>">Link</a>
+                <p><%= item.note %></p>
+                <form action="/myFavorite/<%= item.id %>?_method=put" method="post">
+                    <input type="text" name="note" value="<%= item.note %>">
+                    <button type="submit">Update</button>
+                </form>
+                <form action="/myFavorite/<%= item.id %>?_method=delete" method="post">
+                    <button type="submit">Remove</button>
+                </form>
+            <%} else if(item.data_type == 'image'){%>
+                <img src="<%= item.download_url %>" alt="" width="300" height="300">
+                <a href="<%= item.url %>">Link</a>
+                <p><%= item.note %></p>
+                <form action="/myFavorite/<%= item.id %>?_method=put" method="post">
+                    <input type="text" name="note" value="<%= item.note %>">
+                    <button type="submit">Update</button>
+                </form>
+                <form action="/myFavorite/<%= item.id %>?_method=delete" method="post">
+                    <button type="submit">Remove</button>
+                </form>
+            <%}%>
         <%})%>
     <%}%>
 </body>

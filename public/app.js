@@ -13,10 +13,18 @@ $('.loadMore').click(function(e) {
         },
         contentType:"application/x-www-form-urlencoded",
         success: function(data) {
+            console.log(data);
             data.forEach(element => {
-                let animalTemplate = $("#main").html();
-                let showHtml = Mustache.render(animalTemplate, element);
-                $('.main').append(showHtml);
+                if (element.data_type === 'image'){
+                    let animalTemplate = $("#image").html();
+                    let showHtml = Mustache.render(animalTemplate, element);
+                    $('.main').append(showHtml);
+
+                } else if (element.data_type === 'video') {
+                    let animalTemplate = $("#video").html();
+                    let showHtml = Mustache.render(animalTemplate, element);
+                    $('.main').append(showHtml);
+                }
                 
             });
         },
