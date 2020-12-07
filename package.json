@@ -4,6 +4,7 @@
     "dotenv": "^8.2.0",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
+    "http-msgs": "^1.0.9",
     "method-override": "^3.0.0",
     "nodemon": "^2.0.6",
     "pg": "^8.5.1",
@@ -16,7 +17,6 @@
   "description": "",
   "version": "1.0.0",
   "main": "server.js",
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Janabi/final-project-test.git"

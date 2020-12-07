@@ -4,19 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script id="main" type="text/x-tmpl-mustache">
+        <section id="photo-template">
+          <h2>{{title}}</h2>
+        </section>
+      </script>
 </head>
 <body>
     <form action="/search" method="post">
-        <input type="text" name="search_engine" id="">
+        <input type="text" name="search_engine" id="title">
         <input type="radio" name="category" value="images" id="image">image
         <input type="radio" name="category" value="videos" id="">video
         <input type="radio" name="category" value="gifs" id="">Giphy
         <button type="submit">Search Results</button>
     </form>
+
+    <div id="dataContainer"></div>
+    <div id="demo"></div>
+    <div class="main"></div>
     <%if (images.length > 0){%>
         <%images[0].forEach(image=>{%>
             <div>
-                <img src="<%= image.image_url %>" alt="" srcset="">
+                <img src="<%= image.image_url %>" width="300" height="300" alt="" srcset="">
                 <p><%= image.url %></p>
                 <form action="/addFavorite" method="post">
                     <input type="hidden" name="download_url" value="<%= image.image_url %>">
@@ -30,7 +39,7 @@
         <hr>
         <%images[1].forEach(image=>{%>
             <div>
-                <img src="<%= image.image_url %>" alt="" srcset="">
+                <img src="<%= image.image_url %>" width="300" height="300" alt="" srcset="">
                 <p><%= image.url %></p>
                 <form action="/addFavorite" method="post">
                     <input type="hidden" name="download_url" value="<%= image.image_url %>">
@@ -40,7 +49,7 @@
                 </form>
             </div>
         <%})%>
-
+        <button class="loadMore">Load More</button>    
     <%}%>
 
     <%if (videos.length > 0  ){%>
@@ -48,7 +57,7 @@
             <div>
                 <video width="320" height="240" controls>
                     <source src="<%= video.video_url%>" type="video/mp4">
-                  </video>
+                </video>
                 <p><%=video.url%> </p>
                 <form action="/addFavorite" method="post">
                     <input type="hidden" name="download_url" value="<%= video.video_url %>">
@@ -99,5 +108,9 @@
         
     <%}%>
     
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://pagination.js.org/dist/2.1.5/pagination.min.js"></script>
+    <script src="/app.js"></script>
 </body>
 </html>

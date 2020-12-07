@@ -1,6 +1,7 @@
 'use strict';
 // App Dependencies
 const express = require('express');
+const httpMsgs = require('http-msgs');
 const cors = require('cors');
 
 require('dotenv').config();
@@ -45,7 +46,7 @@ function indexPage(request, response) {
 
 // First attempt to the search page
 function showSearchEngine(request, response) {
-    response.render('./search/search-engine', {images: [], videos: [], gifs: [], noChoice: ''});
+    response.render('./search-engine', {images: [], videos: [], gifs: [], noChoice: ''});
 }
 
 // 
@@ -70,10 +71,11 @@ function logoutSystem(request, response) {
     usernameAccount = '';
     response.redirect('/joinus');
 }
-
+let page= 1;
 // Getting data from API in the search page
 function searchMedia(request, response) {
-    console.log(request.query);
+    const numPerPage = 5;
+    const start = ((page - 1) * numPerPage + 1);
     let category = request.body.category;
     console.log(category);
     let searchResult = request.body.search_engine;
@@ -82,12 +84,11 @@ function searchMedia(request, response) {
     let keyGiphy = process.env.GIPHY_KEY;
 
     if (category === 'images') {
-        let url = `https://api.pexels.com/v1/search?query=${searchResult}&total_results=5`;
+        let url = `https://api.pexels.com/v1/search?query=${searchResult}&per_page=${numPerPage}&page=${start}`;
         superagent.get(url)
         .set({'Authorization': 'Bearer ' + key})
         .then(results=>{
-            
-            let url1 = `https://pixabay.com/api/?key=${keyPixabay}&q=${searchResult}&image_type=photo`;
+            let url1 = `https://pixabay.com/api/?key=${keyPixabay}&q=${searchResult}&image_type=photo&per_page=${numPerPage}&page=${start}`;
             let imageResultPexel = results.body.photos.map(item=>{
                 return new ImagesPexel(item);
             })
@@ -96,7 +97,13 @@ function searchMedia(request, response) {
                 let imageResultPixabay = results.body.hits.map(item=>{
                     return new ImagesPixabay(item);
                 })
-                response.render('./search/search-engine', {images: [imageResultPexel, imageResultPixabay], videos: [], gifs: [], noChoice: ''})
+                httpMsgs.sendJSON(request,response,{
+                    form: searchResult,
+                    page: page,
+                    imagePexel: imageResultPexel,
+                    imagePixabay: imageResultPixabay
+                })
+                // response.render('./search/search-engine', {images: [imageResultPexel, imageResultPixabay], videos: [], gifs: [], noChoice: ''})
             })
             
         })
