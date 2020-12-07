@@ -19,7 +19,6 @@ app.use(methodOverride('_method'));
 
 app.set('view engine', 'ejs');
 const pg = require('pg');
-const { pipe } = require('superagent');
 const client = new pg.Client(process.env.DATABASE_URL);
 
 let usernameAccount = '';
@@ -30,6 +29,7 @@ app.get('/', indexPage);
 // Routes of Search Engine
 app.get('/search', showSearchEngine);
 app.post('/search', searchMedia);
+app.post('/loadMore', loadMore);
 // Routes of Login System
 app.get('/joinus', loginSystem);
 app.post('/signup', signupSystem);
@@ -46,7 +46,7 @@ function indexPage(request, response) {
 
 // First attempt to the search page
 function showSearchEngine(request, response) {
-    response.render('./search-engine', {images: [], videos: [], gifs: [], noChoice: ''});
+    response.render('./search/search-engine', {images: [], videos: [], gifs: [], noChoice: ''});
 }
 
 // 
@@ -71,39 +71,75 @@ function logoutSystem(request, response) {
     usernameAccount = '';
     response.redirect('/joinus');
 }
-let page= 1;
+let page= 0;
+let category, searchResult;
+function loadMore (request, response) {
+    searchMedia(request, response)
+    .then(result=>{
+        console.log(result);
+        let imageUrl = [];
+        let url1 = [];
+        let type = [];
+        let finalArr=[];
+        result[0].forEach(item=>{
+            imageUrl.push(item.image_url);
+            type.push(result[2]);
+        });
+        result[1].forEach(item=>{
+            imageUrl.push(item.image_url);
+            type.push(result[2]);
+        });
+        result[0].forEach(item=>{
+            url1.push(item.url);
+        });
+        result[1].forEach(item=>{
+            url1.push(item.url);
+        });
+        for (let i=0; i< 10;i++){
+            let obj = new Object();
+            obj.imageURL = imageUrl[i];
+            obj.url = url1[i];
+            obj.data_type = type[i];
+            finalArr.push(obj);
+
+        }
+        
+        console.log(finalArr);
+        httpMsgs.sendJSON(request,response,finalArr)
+    })
+}
 // Getting data from API in the search page
 function searchMedia(request, response) {
     const numPerPage = 5;
+    ++page;
     const start = ((page - 1) * numPerPage + 1);
-    let category = request.body.category;
-    console.log(category);
-    let searchResult = request.body.search_engine;
+    if(!category && !searchResult) {
+        category = request.body.category;
+        searchResult = request.body.search_engine;
+    }
     let key = process.env.PEXEL_Key;
     let keyPixabay = process.env.PIXABAY_KEY;
     let keyGiphy = process.env.GIPHY_KEY;
 
     if (category === 'images') {
         let url = `https://api.pexels.com/v1/search?query=${searchResult}&per_page=${numPerPage}&page=${start}`;
-        superagent.get(url)
+        return superagent.get(url)
         .set({'Authorization': 'Bearer ' + key})
         .then(results=>{
             let url1 = `https://pixabay.com/api/?key=${keyPixabay}&q=${searchResult}&image_type=photo&per_page=${numPerPage}&page=${start}`;
             let imageResultPexel = results.body.photos.map(item=>{
                 return new ImagesPexel(item);
             })
-            superagent.get(url1)
+            return superagent.get(url1)
             .then(results=>{
                 let imageResultPixabay = results.body.hits.map(item=>{
                     return new ImagesPixabay(item);
                 })
-                httpMsgs.sendJSON(request,response,{
-                    form: searchResult,
-                    page: page,
-                    imagePexel: imageResultPexel,
-                    imagePixabay: imageResultPixabay
-                })
-                // response.render('./search/search-engine', {images: [imageResultPexel, imageResultPixabay], videos: [], gifs: [], noChoice: ''})
+                if (page === 1) {
+                    response.render('./search/search-engine', {images: [imageResultPexel, imageResultPixabay], videos: [], gifs: [], noChoice: ''})
+                }
+                let type = 'image';
+                return [imageResultPexel, imageResultPixabay, type];
             })
             
         })
