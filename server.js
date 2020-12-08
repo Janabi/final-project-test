@@ -97,6 +97,8 @@ function addFavorite (request, response) {
                 response.render('./user/bookmark-list', {userData: results.rows, name: usernameAccount});
             })
         })
+    } else if(usernameAccount == '') {
+        response.redirect('/joinus');
     }
 }
 
@@ -134,7 +136,6 @@ function loadMore (request, response) {
         let url1 = [];
         let type = [];
         let finalArr=[];
-        console.log(result);
         if(result[1] !== 'giphy') {
             if (result[2] === 'image') {
                 result[0].forEach(item=>{
@@ -206,11 +207,12 @@ function searchMedia(request, response) {
     let keyGiphy = process.env.GIPHY_KEY;
 
     if (category === 'images') {
-        console.log('hello image')
         let url = `https://api.pexels.com/v1/search?query=${searchResult}&per_page=${numPerPage}&page=${start}`;
         return superagent.get(url)
         .set({'Authorization': 'Bearer ' + key})
         .then(results=>{
+            numPerPage = 4;
+            start = ((page - 1) * numPerPage + 1);
             let url1 = `https://pixabay.com/api/?key=${keyPixabay}&q=${searchResult}&image_type=photo&per_page=${numPerPage}&page=${start}`;
             let imageResultPexel = results.body.photos.map(item=>{
                 return new ImagesPexel(item);
@@ -229,7 +231,6 @@ function searchMedia(request, response) {
             
         })
     } else if (category==='videos'){
-        console.log('hello video')
         let url =`https://api.pexels.com/videos/search?query=${searchResult}&per_page=${numPerPage}&page=${start}`;
         return superagent.get(url)
         .set({'Authorization': 'Bearer ' + key})
@@ -237,6 +238,8 @@ function searchMedia(request, response) {
             let videoResultPexel= results.body.videos.map(item=>{
                 return new VideosPexel(item);
             })
+            numPerPage = 4;
+            start = ((page - 1) * numPerPage + 1);
             let url1=`https://pixabay.com/api/videos/?key=${keyPixabay}&q=${searchResult}&per_page=${numPerPage}&page=${start}`;
             return superagent.get(url1)
             .then(results=>{
@@ -251,8 +254,8 @@ function searchMedia(request, response) {
             })
         })
     } else if(category === 'gifs') {
-        console.log('hello gifs')
-        numPerPage = 10;
+        numPerPage = 9;
+        console.log(page)
         start = ((page - 1) * numPerPage + 1);
         let url =`https://api.giphy.com/v1/gifs/search?api_key=${keyGiphy}&q=${searchResult}&limit=${numPerPage}&offset=${start}`;
         return superagent.get(url)

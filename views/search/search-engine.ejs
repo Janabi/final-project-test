@@ -4,170 +4,208 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
+        <link rel="stylesheet" href="/css/style.css">
         <script id="image" type="text/x-tmpl-mustache">
-            <section id="photo-template">
+            <section class="photo-template">
               <img src="{{imageURL}}" alt="">
-              <a href="{{url}}"></a>
-              <p>{{data_type}}</p>
+              <a href="{{url}}" target="_blank" class="btn">Image Link</a>
               <form action="/addFavorite" method="post">
                 <input type="hidden" name="download_url" value="{{imageURL}}">
                 <input type="hidden" name="url" value="{{url}}">
                 <input type="hidden" name="data_type" value="{{data_type}}">
-                <button type="submit">Add to Favorite</button>
+                <button type="submit" class="btn">Add to Favorite</button>
             </form>
             </section>
         </script>
         <script id="video" type="text/x-tmpl-mustache">
-            <section id="video-template">
-                <video width="320" height="240" controls>
+            <section class="video-template">
+                <video controls>
                     <source src="{{imageURL}}" type="video/mp4">
                 </video>
-            <a href="{{url}}"></a>
-              <p>{{data_type}}</p>
+            <a href="{{url}}" target="_blank" class="btn">Video Link</a>
               <form action="/addFavorite" method="post">
-                <input type="hidden" name="download_url" value="{{imageURL}}">
                 <input type="hidden" name="url" value="{{url}}">
                 <input type="hidden" name="data_type" value="{{data_type}}">
-                <button type="submit">Add to Favorite</button>
+                <button type="submit" class="btn">Add to Favorite</button>
             </form>
             </section>
         </script>
     </head>
     <body>
-        <form action="/search" method="post">
-            <input type="text" name="search_engine" id="title">
-            <input type="radio" name="category" value="images" id="image">image
-            <input type="radio" name="category" value="videos" id="">video
-            <input type="radio" name="category" value="gifs" id="">Giphy
-            <input type="hidden" name="sure" value="change">
-            <button type="submit">Search Results</button>
-        </form>
-        
-        <%if (images.length > 0){%>
-            <%images[0].forEach(image=>{%>
+        <div class="wrapper">
+            <header>
+                <h1>Profile Page</h1>
+            </header>
+            <form action="/search" method="post" class="search-box">
                 <div>
-                    <img src="<%= image.image_url %>" width="300" height="300" alt="" srcset="">
-                    <a href="<%= image.url %>"></a>
-                    <form action="/addFavorite" method="post">
-                        <input type="hidden" name="download_url" value="<%= image.image_url %>">
-                        <input type="hidden" name="url" value="<%= image.url %>">
-                        <input type="hidden" name="data_type" value="<%= 'image' %>">
-                        <button type="submit">Add to Favorite</button>
-                    </form>
+                    <input type="text" name="search_engine" id="title" placeholder="type what you like to search...">
                 </div>
-                <%})%>
-                <%images[1].forEach(image=>{%>
-                    <div>
-                        <img src="<%= image.image_url %>" width="300" height="300" alt="" srcset="">
-                        <a href="<%= image.url %>"></a>
-                        <form action="/addFavorite" method="post">
-                            <input type="hidden" name="download_url" value="<%= image.image_url %>">
-                            <input type="hidden" name="url" value="<%= image.url %>">
-                            <input type="hidden" name="data_type" value="<%= 'image' %>">
-                            <button type="submit">Add to Favorite</button>
-                        </form>
-                    </div>
+                <div class="container-radio">
+                    <ul>
+                        <li>
+                          <input type="radio" id="f-option" name="category" value="images">
+                          <label for="f-option">Image</label>
+                          
+                          <div class="check"></div>
+                        </li>
+                        
+                        <li>
+                          <input type="radio" id="s-option" name="category" value="videos">
+                          <label for="s-option">Video</label>
+                          
+                          <div class="check"><div class="inside"></div></div>
+                        </li>
+                        
+                        <li>
+                          <input type="radio" id="t-option" name="category" value="gifs">
+                          <label for="t-option">Giphy</label>
+                          
+                          <div class="check"><div class="inside"></div></div>
+                        </li>
+                      </ul>
+                </div>
+                <input type="hidden" name="sure" value="change">
+                <div>
+                    <button type="submit" class="btn search">Search Results</button>
+                </div>
+            </form>
+            
+            <%if (images.length > 0){%>
+                <div class="main">
+                    <%images[0].forEach(image=>{%>
+                        <div class="photo-template">
+                            <img src="<%= image.image_url %>" alt="" srcset="">
+                            <a href="<%= image.url %>" target="_blank" class="btn">Image Link</a>
+                            <form action="/addFavorite" method="post">
+                                <input type="hidden" name="download_url" value="<%= image.image_url %>">
+                                <input type="hidden" name="url" value="<%= image.url %>">
+                                <input type="hidden" name="data_type" value="<%= 'image' %>">
+                                <button type="submit" class="btn">Add to Favorite</button>
+                            </form>
+                        </div>
+                    <%})%>
+                    <%images[1].forEach(image=>{%>
+                        <div class="photo-template">
+                            <img src="<%= image.image_url %>" alt="" srcset="">
+                            <a href="<%= image.url %>" target="_blank" class="btn">Image Link</a>
+                            <form action="/addFavorite" method="post">
+                                <input type="hidden" name="download_url" value="<%= image.image_url %>">
+                                <input type="hidden" name="url" value="<%= image.url %>">
+                                <input type="hidden" name="data_type" value="<%= 'image' %>">
+                                <button type="submit" class="btn">Add to Favorite</button>
+                            </form>
+                        </div>
                     <%})%>   
-                    <div class="main">
-                        <section id="photo-template">
+                    <div class="main-load">
+                        <section class="photo-template">
                             <img src="" alt="">
-                            <a href=""></a>
+                            <a href="" target="_blank" class="btn">Image Link</a>
                             <form action="/addFavorite" method="post">
                                 <input type="hidden" name="download_url" value="">
                                 <input type="hidden" name="url" value="">
                                 <input type="hidden" name="data_type" value="">
-                                <button type="submit">Add to Favorite</button>
+                                <button type="submit" class="btn">Add to Favorite</button>
                             </form>
                         </section>
                     </div>
-                    <button class="loadMore">Load More</button> 
-    <%}%>
-
-    <%if (videos.length > 0  ){%>
-        <%videos[0].forEach(video=>{%>
-            <div>
-                <video width="320" height="240" controls>
-                    <source src="<%= video.video_url%>" type="video/mp4">
-                </video>
-                <a href="<%=video.url%>"></a>
-                <form action="/addFavorite" method="post">
-                    <input type="hidden" name="download_url" value="<%= video.video_url %>">
-                    <input type="hidden" name="url" value="<%= video.url %>">
-                    <input type="hidden" name="data_type" value="<%= 'video' %>">
-                    <button type="submit">Add to Favorite</button>
-                </form>
-            </div>
-        <%})%>
-        <hr>
-        <hr>
-        <%videos[1].forEach(video=>{%>
-            <div>
-                <video width="320" height="240" controls>
-                    <source src="<%= video.video_url%>" type="video/mp4">
-                  </video>
-                <a href="<%=video.url%>"></a>
-                <form action="/addFavorite" method="post">
-                    <input type="hidden" name="download_url" value="<%= video.video_url %>">
-                    <input type="hidden" name="url" value="<%= video.url %>">
-                    <input type="hidden" name="data_type" value="<%= 'video' %>">
-                    <button type="submit">Add to Favorite</button>
-                </form>
-            </div>
-        <%})%>   
-        <div class="main">
-            <section id="video-template">
-                <video width="320" height="240" controls>
-                    <source src="" type="video/mp4">
-                </video>
-                <a href=""></a>
-                <form action="/addFavorite" method="post">
-                    <input type="hidden" name="download_url" value="">
-                    <input type="hidden" name="url" value="">
-                    <input type="hidden" name="data_type" value="">
-                    <button type="submit">Add to Favorite</button>
-                </form>
-            </section>
-        </div>
-        <button class="loadMore">Load More</button> 
-    <%}%>
-
-    <%if (gifs.length > 0  ){%>
-        <%gifs.forEach(video=>{%>
-            <div>
-                <video width="320" height="240" controls>
-                    <source src="<%= video.gif_url%>" type="video/mp4">
-                  </video>
-                <a href="<%=video.url%>"></a>
-                <form action="/addFavorite" method="post">
-                    <input type="hidden" name="download_url" value="<%= video.video_url %>">
-                    <input type="hidden" name="url" value="<%= video.url %>">
-                    <input type="hidden" name="data_type" value="<%= 'video' %>">
-                    <button type="submit">Add to Favorite</button>
-                </form>
-            </div>
-        <%})%>
-           
-        <div class="main">
-            <section id="video-template">
-                <video width="320" height="240" controls>
-                    <source src="" type="video/mp4">
-                </video>
-                <a href=""></a>
-                <form action="/addFavorite" method="post">
-                    <input type="hidden" name="download_url" value="">
-                    <input type="hidden" name="url" value="">
-                    <input type="hidden" name="data_type" value="">
-                    <button type="submit">Add to Favorite</button>
-                </form>
-            </section>
-        </div>
-        <button class="loadMore">Load More</button> 
-    <%}%>
-
-    <%if (noChoice.length > 0  ){%>
-        <p><%= noChoice %></p>
+                </div>
+                <div class="loading">
+                    <button class="loadMore btn">Load More</button> 
+                </div>
+            <%}%>
+    
+            <%if (videos.length > 0  ){%>
+                <div class="main">
+                    <%videos[0].forEach(video=>{%>
+                        <div class="video-template">
+                            <video controls>
+                                <source src="<%= video.video_url%>" type="video/mp4">
+                            </video>
+                            <a href="<%=video.url%>" target="_blank" class="btn">Video Link</a>
+                            <form action="/addFavorite" method="post">
+                                <input type="hidden" name="download_url" value="<%= video.video_url %>">
+                                <input type="hidden" name="url" value="<%= video.url %>">
+                                <input type="hidden" name="data_type" value="<%= 'video' %>">
+                                <button type="submit" class="btn">Add to Favorite</button>
+                            </form>
+                        </div>
+                    <%})%>
+                    <%videos[1].forEach(video=>{%>
+                        <div class="video-template">
+                            <video controls>
+                                <source src="<%= video.video_url%>" type="video/mp4">
+                            </video>
+                            <a href="<%=video.url%>" target="_blank" class="btn">Video Link</a>
+                            <form action="/addFavorite" method="post">
+                                <input type="hidden" name="download_url" value="<%= video.video_url %>">
+                                <input type="hidden" name="url" value="<%= video.url %>">
+                                <input type="hidden" name="data_type" value="<%= 'video' %>">
+                                <button type="submit" class="btn">Add to Favorite</button>
+                            </form>
+                        </div>
+                    <%})%>
+                    <div class="main-load">
+                        <section class="video-template">
+                            <video controls>
+                                <source src="" type="video/mp4">
+                                </video>
+                                <a href="" target="_blank" class="btn">Video Link</a>
+                            <form action="/addFavorite" method="post">
+                                <input type="hidden" name="download_url" value="">
+                                <input type="hidden" name="url" value="">
+                                <input type="hidden" name="data_type" value="">
+                                <button type="submit" class="btn">Add to Favorite</button>
+                            </form>
+                        </section>
+                    </div>
+                </div>   
+                <div class="loading">
+                    <button class="loadMore btn">Load More</button> 
+                </div>
+            <%}%>
         
-    <%}%>
+            <%if (gifs.length > 0  ){%>
+                <div class="main">
+                    <%gifs.forEach(video=>{%>
+                        <div class="video-template">
+                            <video controls>
+                                <source src="<%= video.gif_url%>" type="video/mp4">
+                            </video>
+                            <a href="<%=video.url%>" target="_blank" class="btn">Video Link</a>
+                            <form action="/addFavorite" method="post">
+                                <input type="hidden" name="download_url" value="<%= video.gif_url %>">
+                                <input type="hidden" name="url" value="<%= video.url %>">
+                                <input type="hidden" name="data_type" value="<%= 'video' %>">
+                                <button type="submit" class="btn">Add to Favorite</button>
+                            </form>
+                        </div>
+                    <%})%>
+                    
+                    <div class="main-load">
+                        <section class="video-template">
+                            <video controls>
+                                <source src="" type="video/mp4">
+                                </video>
+                                <a href="" target="_blank" class="btn">Video Link</a>
+                            <form action="/addFavorite" method="post">
+                                <input type="hidden" name="download_url" value="">
+                                <input type="hidden" name="url" value="">
+                                <input type="hidden" name="data_type" value="">
+                                <button type="submit" class="btn">Add to Favorite</button>
+                            </form>
+                        </section>
+                    </div>
+                </div>
+                <div class="loading">
+                    <button class="loadMore btn">Load More</button> 
+                </div>
+            <%}%>
+        
+            <%if (noChoice.length > 0  ){%>
+                <p><%= noChoice %></p>
+                
+            <%}%>
+        </div>
     
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.1.0/mustache.min.js"></script>
